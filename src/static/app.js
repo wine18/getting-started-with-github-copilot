@@ -25,20 +25,20 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(`Participants count: ${details.participants.length}`);
 
         activityCard.innerHTML = `
-          <h4 style="color:#1976d2; margin-bottom:8px;">${name}</h4>
-          <p style="margin-bottom:12px;">${details.description}</p>
-          <p style="margin-bottom:4px;"><strong>Schedule:</strong> ${details.schedule}</p>
-          <p style="margin-bottom:10px;"><strong>Availability:</strong> ${spotsLeft} spots left</p>
-          <div class="participants-section" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
-            <p style="font-weight:bold; margin-bottom:8px;">Participants:</p>
+          <h4 class="activity-title">${name}</h4>
+          <p class="activity-description">${details.description}</p>
+          <p class="activity-schedule"><strong>Schedule:</strong> ${details.schedule}</p>
+          <p class="activity-availability"><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          <div class="participants-section">
+            <p class="participants-label">Participants:</p>
             ${
               details.participants.length > 0
-                ? `<ul style="list-style-type: disc; margin-left: 20px; padding: 0;">
+                ? `<ul class="participants-list">
                     ${details.participants.map(
-                      (p) => `<li style='margin-bottom:6px;'><span style='display:inline-flex; align-items:center; gap:8px;'>${p}<span class='delete-participant' data-activity='${name}' data-email='${p}' style='cursor:pointer;color:#c00;font-size:1.1em;' title='Remove participant'>🗑️</span></span></li>`
+                      (p) => `<li class="participant-item"><span class="participant-info">${p}<span class='delete-participant' data-activity='${name}' data-email='${p}' title='Remove participant'>🗑️</span></span></li>`
                     ).join("")}
                   </ul>`
-                : '<p style="font-style: italic; color: #999;">No participants yet</p>'
+                : '<p class="no-participants">No participants yet</p>'
             }
           </div>
         `;
