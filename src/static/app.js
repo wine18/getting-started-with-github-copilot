@@ -22,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Debug: log participants to console
         console.log(`Activity: ${name}, Participants:`, details.participants);
-        console.log(`Participants count: ${details.participants.length}`);
 
         activityCard.innerHTML = `
           <h4 class="activity-title">${name}</h4>
