@@ -22,23 +22,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Debug: log participants to console
         console.log(`Activity: ${name}, Participants:`, details.participants);
+        console.log(`Participants count: ${details.participants.length}`);
 
         activityCard.innerHTML = `
           <h4 style="color:#1976d2; margin-bottom:8px;">${name}</h4>
           <p style="margin-bottom:12px;">${details.description}</p>
           <p style="margin-bottom:4px;"><strong>Schedule:</strong> ${details.schedule}</p>
           <p style="margin-bottom:10px;"><strong>Availability:</strong> ${spotsLeft} spots left</p>
-          <div class="participants-section">
-            <span style="font-weight:bold; color:#222; display:block; margin-bottom:6px;">Participants:</span>
-            <ul class="participants-list" style="list-style-type: disc; margin-left: 20px; color: #333; font-size: 1rem;">
-              ${
-                details.participants.length > 0
-                  ? details.participants.map(
-                      (p) => `<li style='margin-bottom:4px;'>${p}</li>`
-                    ).join("")
-                  : '<li><em>No participants yet</em></li>'
-              }
-            </ul>
+          <div class="participants-section" style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+            <p style="font-weight:bold; margin-bottom:8px;">Participants:</p>
+            ${
+              details.participants.length > 0
+                ? `<ul style="list-style-type: disc; margin-left: 20px; padding: 0;">
+                    ${details.participants.map(
+                      (p) => `<li style='margin-bottom:6px;'><span style='display:inline-flex; align-items:center; gap:8px;'>${p}<span class='delete-participant' data-activity='${name}' data-email='${p}' style='cursor:pointer;color:#c00;font-size:1.1em;' title='Remove participant'>🗑️</span></span></li>`
+                    ).join("")}
+                  </ul>`
+                : '<p style="font-style: italic; color: #999;">No participants yet</p>'
+            }
           </div>
         `;
 
@@ -49,6 +50,39 @@ document.addEventListener("DOMContentLoaded", () => {
         option.value = name;
         option.textContent = name;
         activitySelect.appendChild(option);
+      });
+
+      // Add event listeners for delete buttons
+      document.querySelectorAll('.delete-participant').forEach(icon => {
+        icon.addEventListener('click', async (e) => {
+          const activity = icon.getAttribute('data-activity');
+          const email = icon.getAttribute('data-email');
+          if (confirm(`Remove ${email} from ${activity}?`)) {
+            try {
+              const response = await fetch(`/activities/${encodeURIComponent(activity)}/unregister?email=${encodeURIComponent(email)}`, {
+                method: 'POST',
+              });
+              const result = await response.json();
+              if (response.ok) {
+                messageDiv.textContent = result.message || 'Participant removed.';
+                messageDiv.className = 'success';
+                fetchActivities();
+              } else {
+                messageDiv.textContent = result.detail || 'Failed to remove participant.';
+                messageDiv.className = 'error';
+              }
+              messageDiv.classList.remove('hidden');
+              setTimeout(() => {
+                messageDiv.classList.add('hidden');
+              }, 3000);
+            } catch (error) {
+              messageDiv.textContent = 'Error removing participant.';
+              messageDiv.className = 'error';
+              messageDiv.classList.remove('hidden');
+              console.error('Error removing participant:', error);
+            }
+          }
+        });
       });
     } catch (error) {
       activitiesList.innerHTML = "<p>Failed to load activities. Please try again later.</p>";
